@@ -17,7 +17,7 @@ This directory is the canonical, app-independent Synaxarium content source. `syn
 }
 ```
 
-`sourceURL` is optional and must only be added after checking that the linked source supports that specific reading. IDs are derived from the normalized Coptic date and title, with a SHA-256 prefix and deterministic occurrence suffix for collision safety.
+`sourceURL` is optional and must only be added after checking that the linked source supports that specific reading. Every reading ID must be a non-empty, globally unique, immutable identifier. An ID is the durable identity used by deep links and future persisted features; it is deliberately independent of editable fields such as the title, Coptic date, and story.
 
 ## Editorial changes in version 1
 
@@ -33,8 +33,8 @@ No other title, Coptic date, or story text was edited during the import.
 
 1. Edit `synaxarium.json`; keep each reading's `copticDate` equal to its parent day key.
 2. Add `sourceURL` only after verifying the source. For a published content change, increment `version` and set `updatedAt` to the publication time in UTC.
-3. If a title or Coptic date changes, update its deterministic ID. Running the validator prints the expected ID for any mismatch.
-4. Run `node validate.mjs` and review the diff before publishing.
+3. Preserve an existing reading's ID across title, date, story, and source edits. Assign a new unique ID only when adding a genuinely new reading; never recycle a deleted reading's ID for different content.
+4. Run `node validate.mjs` and review the diff before publishing. The validator enforces non-empty, globally unique IDs, but editorial review is responsible for catching accidental changes to an existing ID.
 
 ## Publish and roll back
 

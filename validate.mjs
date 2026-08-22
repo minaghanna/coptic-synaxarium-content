@@ -1,29 +1,4 @@
-import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-
-function readingIdBase(copticDate, title) {
-  const slug = title
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/&/g, " and ")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 72) || "reading";
-  const digest = createHash("sha256")
-    .update(`${copticDate}\0${title.normalize("NFC")}`, "utf8")
-    .digest("hex")
-    .slice(0, 16);
-
-  return `${copticDate}-${slug}-${digest}`;
-}
-
-function nextReadingId(copticDate, title, seen) {
-  const base = readingIdBase(copticDate, title);
-  const occurrence = (seen.get(base) ?? 0) + 1;
-  seen.set(base, occurrence);
-  return occurrence === 1 ? base : `${base}-${occurrence}`;
-}
 
 const contentURL = new URL("./synaxarium.json", import.meta.url);
 const content = JSON.parse(await readFile(contentURL, "utf8"));
@@ -54,7 +29,6 @@ for (const day of actualDays) if (!expectedDays.has(day)) fail(`unexpected day $
 let readingCount = 0;
 let sourceCount = 0;
 const ids = new Set();
-const seenBases = new Map();
 
 for (const [dayKey, day] of Object.entries(content.days ?? {})) {
   if (typeof day.copticDay !== "string" || !day.copticDay.trim()) {
@@ -77,10 +51,6 @@ for (const [dayKey, day] of Object.entries(content.days ?? {})) {
       fail(`${label}: copticDate ${reading.copticDate} does not match parent ${dayKey}`);
     }
 
-    const expectedId = nextReadingId(reading.copticDate, reading.title, seenBases);
-    if (reading.id !== expectedId) {
-      fail(`${label}: unstable ID ${reading.id}; expected ${expectedId}`);
-    }
     if (ids.has(reading.id)) fail(`${label}: duplicate ID ${reading.id}`);
     ids.add(reading.id);
 
