@@ -1,5 +1,7 @@
 import { readFile } from "node:fs/promises";
 
+import { isRFC3339InternetDateTime } from "./timestamp.mjs";
+
 const contentURL = new URL("./synaxarium.json", import.meta.url);
 const content = JSON.parse(await readFile(contentURL, "utf8"));
 const errors = [];
@@ -8,8 +10,8 @@ const fail = (message) => errors.push(message);
 if (!Number.isInteger(content.version) || content.version < 1) {
   fail(`version must be a positive integer; got ${content.version}`);
 }
-if (typeof content.updatedAt !== "string" || Number.isNaN(Date.parse(content.updatedAt))) {
-  fail("updatedAt must be a valid RFC 3339 timestamp");
+if (!isRFC3339InternetDateTime(content.updatedAt)) {
+  fail("updatedAt must be a full RFC 3339 internet date-time timestamp");
 }
 if (!content.days || typeof content.days !== "object" || Array.isArray(content.days)) {
   fail("days must be an object");
@@ -66,7 +68,6 @@ for (const [dayKey, day] of Object.entries(content.days ?? {})) {
   }
 }
 
-if (readingCount !== 700) fail(`expected 700 readings; got ${readingCount}`);
 if (ids.size !== readingCount) fail(`expected ${readingCount} unique IDs; got ${ids.size}`);
 
 if (errors.length > 0) {

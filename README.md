@@ -32,9 +32,9 @@ No other title, Coptic date, or story text was edited during the import.
 ## Edit and validate
 
 1. Edit `synaxarium.json`; keep each reading's `copticDate` equal to its parent day key.
-2. Add `sourceURL` only after verifying the source. For a published content change, increment `version` and set `updatedAt` to the publication time in UTC.
+2. Add `sourceURL` only after verifying the source. For a published content change, increment `version` and set `updatedAt` to a full RFC 3339 internet date-time timestamp, normally the publication time in UTC (for example, `2026-08-21T00:00:00Z`).
 3. Preserve an existing reading's ID across title, date, story, and source edits. Assign a new unique ID only when adding a genuinely new reading; never recycle a deleted reading's ID for different content.
-4. Run `node validate.mjs` and review the diff before publishing. The validator enforces non-empty, globally unique IDs, but editorial review is responsible for catching accidental changes to an existing ID.
+4. Run `node --test validate.test.mjs`, then `node validate.mjs`, and review the diff before publishing. The validator enforces valid timestamps and non-empty, globally unique IDs, but editorial review is responsible for catching accidental changes to an existing ID.
 
 ## Publish and roll back
 
