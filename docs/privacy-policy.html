@@ -23,6 +23,12 @@
     footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid currentColor; }
   </style>
 </head>
+<script>
+  // Preserve the PhotoSpace policy link embedded in older builds.
+  if (window.location.hash === "#photospace") {
+    window.location.replace("https://minaghanna.github.io/photospace-support/privacy-policy.html");
+  }
+</script>
 <body>
 <main>
   <nav aria-label="App privacy policies"><a href="https://minaghanna.github.io/photospace-support/privacy-policy.html">PhotoSpace Privacy Policy</a></nav>
